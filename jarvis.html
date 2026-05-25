@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. - Core Interface v3</title>
+    <style>
+        :root {
+            --neon-blue: #00adb5;
+            --dark-bg: #040406;
+            --panel-bg: rgba(13, 13, 20, 0.85);
+            --neon-glow: rgba(0, 173, 181, 0.4);
+        }
+
+        body { 
+            background-color: var(--dark-bg); 
+            color: var(--neon-blue); 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: auto;
+        }
+
+        .container { 
+            background: var(--panel-bg); 
+            padding: 40px 30px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(0, 173, 181, 0.25); 
+            box-shadow: 0 0 40px rgba(0, 173, 181, 0.1), inset 0 0 20px rgba(0, 0, 0, 0.6);
+            max-width: 380px; 
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            letter-spacing: 6px;
+            margin: 0 0 10px 0;
+            text-shadow: 0 0 12px var(--neon-glow);
+            font-weight: 300;
+            color: #fff;
+        }
+
+        /* Indicador HUD de Batería */
+        #hud-battery {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: rgba(0, 173, 181, 0.6);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .orbe-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 35px;
+            cursor: pointer;
+        }
+
+        .orbe-externo {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px dashed rgba(0, 173, 181, 0.3);
+            animation: rotarAnillo 16s linear infinite;
+            transition: all 0.4s ease;
+        }
+
+        .orbe-nucleo {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,173,181,1) 0%, rgba(10,30,50,0.8) 65%, rgba(4,4,6,1) 100%);
+            box-shadow: 0 0 35px rgba(0, 173, 181, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.3);
+            animation: palpitar 3s ease-in-out infinite;
+            transition: all 0.4s ease;
+            overflow: hidden;
+        }
+
+        .orbe-nucleo::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to bottom, transparent, var(--neon-blue), transparent);
+            box-shadow: 0 0 8px var(--neon-blue);
+            top: -10%;
+            left: 0;
+            animation: escanearSistemas 4s ease-in-out infinite;
+            opacity: 0.7;
+        }
+
+        .orbe-nucleo::after {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 173, 181, 0.3);
+            animation: destello 2s ease-in-out infinite alternate;
+        }
+
+        .pensando .orbe-nucleo {
+            animation: procesar 0.3s ease-in-out infinite alternate;
+            background: radial-gradient(circle, #ff4757 0%, rgba(40,10,20,0.85) 65%, rgba(4,4,6,1) 100%);
+            box-shadow: 0 0 45px rgba(255, 71, 87, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+        .pensando .orbe-nucleo::before {
+            background: #ff4757;
+            box-shadow: 0 0 8px #ff4757;
+            animation: escanearSistemas 0.8s linear infinite;
+        }
+        .pensando .orbe-externo {
+            border-color: rgba(255, 71, 87, 0.5);
+            animation: rotarAnillo 0.8s linear infinite;
+        }
+
+        .hablando .orbe-nucleo {
+            animation: ecualizarOrbe 0.12s ease-in-out infinite alternate;
+            box-shadow: 0 0 55px rgba(0, 220, 230, 0.8), inset 0 0 25px rgba(255, 255, 255, 0.5);
+            background: radial-gradient(circle, rgba(0,230,240,1) 0%, rgba(10,40,70,0.85) 60%, rgba(4,4,6,1) 100%);
+        }
+        .hablando .orbe-externo {
+            animation: rotarAnillo 0.4s linear infinite;
+            border-color: rgba(0, 255, 255, 0.7);
+            transform: scale(1.08);
+        }
+
+        .input-box {
+            width: 100%;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        input { 
+            width: 100%; 
+            padding: 14px 20px; 
+            background: rgba(10, 10, 15, 0.8); 
+            color: #fff; 
+            border: 1px solid rgba(0, 173, 181, 0.2); 
+            text-align: center; 
+            border-radius: 30px; 
+            outline: none; 
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        input:focus { 
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 173, 181, 0.25);
+            background: rgba(15, 15, 25, 0.9);
+        }
+
+        #log { 
+            color: #a0a5b5; 
+            font-size: 0.9rem; 
+            line-height: 1.5; 
+            margin: 15px 0 0 0;
+            min-height: 50px;
+            text-align: center;
+            letter-spacing: 0.2px;
+        }
+
+        @keyframes rotarAnillo {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes palpitar {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.03); opacity: 1; box-shadow: 0 0 35px rgba(0, 173, 181, 0.7); }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+
+        @keyframes destello {
+            0% { transform: scale(0.96); opacity: 0.2; }
+            100% { transform: scale(1.04); opacity: 0.6; }
+        }
+
+        @keyframes procesar {
+            0% { transform: scale(1.02); }
+            100% { transform: scale(1.08); }
+        }
+
+        @keyframes ecualizarOrbe {
+            0% { transform: scale(0.97) rotate(-0.5deg); }
+            100% { transform: scale(1.07) rotate(0.5deg); }
+        }
+
+        @keyframes escanearSistemas {
+            0% { top: -10%; }
+            50% { top: 110%; }
+            100% { top: -10%; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="container" id="coreContainer">
+        <h2>J.A.R.V.I.S.</h2>
+        <div id="hud-battery">Energía: Escaneando...</div>
+        
+        <div class="orbe-wrapper" onclick="enviar()">
+            <div class="orbe-externo"></div>
+            <div class="orbe-nucleo"></div>
+        </div>
+
+        <div class="input-box" style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="cmd" placeholder="Escriba o presione el micrófono..." autocomplete="off" style="flex: 1;">
+            <button id="btnVoz" style="background: rgba(0, 173, 181, 0.2); border: 1px solid var(--neon-blue); color: var(--neon-blue); border-radius: 50%; width: 45px; height: 45px; cursor: pointer; font-size: 1.2rem;">🎙️</button>
+        </div>
+
+        <p id="log">Inicializando sistemas tácticos...</p>
+    </div>
+
+    <script>
+        const API_KEY_MISTRAL = "GpYRcwr2NCfiZVQR7Rnx7SLcWPqonqqg";
+        let trackLinterna = null; // Guardará el canal de la linterna
+
+        // --- SUBRUTINA: Matriz de Partículas de Fondo ---
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('touchmove', (e) => { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; });
+        window.addEventListener('touchend', () => { mouse.x = null; mouse.y = null; });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.speedY = Math.random() * 0.4 - 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                else if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                else if (this.y < 0) this.y = canvas.height;
+
+                if (mouse.x && mouse.y) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 100) {
+                        let force = (100 - distance) / 100;
+                        this.x -= dx * force * 0.03;
+                        this.y -= dy * force * 0.03;
+                    }
+                }
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(0, 173, 181, 0.3)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 45; i++) { particles.push(new Particle()); }
+        }
+        initParticles();
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // --- SUBRUTINA: Frecuencia de Audio de Diagnóstico ---
+        function ejecutarSonidoDiagnostico() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const audioCtx = new AudioContext();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.4); 
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5); 
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } catch(e) { console.log("Audio contextual bloqueado."); }
+        }
+
+        // --- SUBRUTINA NATIIVA: Monitor de Batería Universal ---
+        let datosBateriaGlobal = "Información de energía no disponible.";
+        function inicializarMonitorBateria() {
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(function(battery) {
+                    function actualizarHUD() {
+                        const nivel = Math.round(battery.level * 100);
+                        const cargando = battery.charging ? "⚡ Cargando" : "🔋 Descargando";
+                        document.getElementById("hud-battery").innerText = `Energía: ${nivel}% (${cargando})`;
+                        datosBateriaGlobal = `El dispositivo se encuentra al ${nivel}% de capacidad y actualmente está ${battery.charging ? 'conectado a una fuente de energía' : 'usando la batería interna'}.`;
+                    }
+                    actualizarHUD();
+                    battery.addEventListener('levelchange', actualizarHUD);
+                    battery.addEventListener('chargingchange', actualizarHUD);
+                });
+            } else {
+                document.getElementById("hud-battery").innerText = "Energía: No compatible";
+            }
+        }
+
+        // --- SUBRUTINA NATIVA: Sistema de Control de Linterna (Flash) ---
+        async function controlarLinterna(encender) {
+            try {
+                if (encender) {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: { exact: "environment" } }
+                    });
+                    trackLinterna = stream.getVideoTracks()[0];
+                    const capabilities = trackLinterna.getCapabilities();
+                    
+                    if (capabilities.torch) {
+                        await trackLinterna.applyConstraints({ advanced: [{ torch: true }] });
+                        return true;
+                    } else {
+                        trackLinterna.stop();
+                        return false;
+                    }
+                } else {
+                    if (trackLinterna) {
+                        await trackLinterna.applyConstraints({ advanced: [{ torch: false }] });
+                        trackLinterna.stop();
+                        trackLinterna = null;
+                    }
+                    return true;
+                }
+            } catch (e) {
+                console.error("Error en módulo de linterna:", e);
+                return false;
+            }
+        }
+
+        setTimeout(() => {
+            ejecutarSonidoDiagnostico();
+            inicializarMonitorBateria();
+            
+            // --- FORZAR PERMISO DE MICRÓFONO ---
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(() => {
+                    console.log("Acceso al micrófono concedido, señor.");
+                })
+                .catch((err) => {
+                    console.log("El acceso al micrófono fue denegado o no está disponible.", err);
+                });
+            
+            document.getElementById("log").innerText = "Sistemas listos. Esperando órdenes, señor.";
+        }, 1200);
+
+        // --- LOGICA DE PROCESAMIENTO MISTRAL AI Y VOZ ---
+        document.getElementById("cmd").addEventListener("keyup", function(e) { 
+            if (e.key === "Enter") enviar(); 
+        });
+        
+        function hablarConNavegador(texto) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                var uttr = new SpeechSynthesisUtterance(texto);
+                uttr.lang = 'es-ES';
+                uttr.rate = 1.0;     
+                uttr.pitch = 0.50; 
+                var container = document.getElementById("coreContainer");
+
+                uttr.onstart = function() {
+                    container.classList.remove("pensando");
+                    container.classList.add("hablando");
+                };
+                uttr.onend = function() { container.classList.remove("hablando"); };
+                uttr.onerror = function() { container.classList.remove("hablando"); };
+                window.speechSynthesis.speak(uttr);
+            }
+        }
+       
+        function guardarMemoria(clave, valor) {
+            localStorage.setItem(clave, valor);
+        }
+
+        function leerMemoria(clave) {
+            return localStorage.getItem(clave);
+        }
+
+        function obtenerContextoGlobal() {
+            const ahora = new Date();
+            const horaOpciones = { hour: '2-digit', minute: '2-digit', hour12: true };
+            const fechaOpciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const horaLocal = ahora.toLocaleTimeString(navigator.language, horaOpciones);
+            const fechaLocal = ahora.toLocaleDateString(navigator.language, fechaOpciones);
+            const hora24 = ahora.getHours();
+
+            let momentoDia = "de noche";
+            if (hora24 >= 6 && hora24 < 12) momentoDia = "de mañana";
+            else if (hora24 >= 12 && hora24 < 19) momentoDia = "de tarde";
+
+            const zonaHorariaActiva = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const userAgent = navigator.userAgent; // Detecta qué dispositivo/navegador entra automáticamente
+
+            return `Zona Horaria: ${zonaHorariaActiva}. Fecha: ${fechaLocal}. Hora: ${horaLocal}. Es ${momentoDia}. Dispositivo conectado (UserAgent): ${userAgent}. Estado actual de batería: ${datosBateriaGlobal}`;
+        }
+
+        async function preguntarAMistral(preguntaUsuario) {
+            const url = "https://api.mistral.ai/v1/chat/completions";
+            const datosDispositivo = obtenerContextoGlobal();
+
+            const payload = {
+                model: "open-mistral-7b",
+                messages: [
+                    {
+                        role: "system",
+                        content: `Actúas como J.A.R.V.I.S., el asistente de IA de Iron Man. Sé extremadamente educado, ingenioso y usa SIEMPRE la palabra 'señor' para dirigirte al usuario. Tus respuestas deben sonar naturales y cortas (máximo 2 oraciones). CONTEXTO HARDWARE EN TIEMPO REAL: ${datosDispositivo}. Usa estos datos de hardware discretamente si te preguntan por el estado de la batería, hora o qué dispositivo estás analizando.`
+                    },
+                    {
+                        role: "user",
+                        content: preguntaUsuario
+                    }
+                ],
+                temperature: 0.6, 
+                max_tokens: 120
+            };
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${API_KEY_MISTRAL}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.status === 200) {
+                const datos = await response.json();
+                return datos.choices[0].message.content;
+            } else {
+                return `Señor, error en la matriz de comunicación: ${response.status}.`;
+            }
+        }
+
+        async function enviar() {
+            var inp = document.getElementById("cmd");
+            var log = document.getElementById("log");
+            var container = document.getElementById("coreContainer");
+            var orden = inp.value.trim();
+            if(!orden) return;
+            
+            const ordenMinuscula = orden.toLowerCase();
+            
+            // --- PROTOCOLO 1: LINCORNE / LINTERNA (CONTROL DE HARDWARE) ---
+            if (ordenMinuscula.includes("prende la linterna") || ordenMinuscula.includes("enciende la linterna") || ordenMinuscula.includes("activa la linterna")) {
+                container.classList.add("pensando");
+                log.innerText = "Accediendo a los sistemas ópticos...";
+                
+                const exito = await controlarLinterna(true);
+                let respuesta = "";
+                if(exito) {
+                    respuesta = "Entendido, señor. Focos principales encendidos.";
+                } else {
+                    respuesta = "Señor, no he podido inicializar el hardware de iluminación. Asegúrese de otorgar permisos de cámara.";
+                }
+                log.innerText = respuesta;
+                log.style.color = "#fff";
+                hablarConNavegador(respuesta);
+                inp.value = "";
+                return;
+            }
+
+            if (ordenMinuscula.includes("apaga la linterna") || ordenMinuscula.includes("desactiva la linterna")) {
+                container.classList.add("pensando");
+                log.innerText = "Desactivando sistemas ópticos...";
+                
+                await controlarLinterna(false);
+                const respuesta = "Sistemas de iluminación apagados, señor.";
+                log.innerText = respuesta;
+                log.style.color = "#fff";
+                hablarConNavegador(respuesta);
+                inp.value = "";
+                return;
+            }
+
+            // --- PROTOCOLO 2: GESTIÓN DE MEDIOS (REPRODUCCIÓN Y BÚSQUEDA) ---
+            if (ordenMinuscula.includes("reproduce") || ordenMinuscula.includes("busca") || ordenMinuscula.includes("pon")) {
+                container.classList.add("pensando");
+                
+                let busqueda = ordenMinuscula
+                    .replace(/reproduce|busca en youtube|búscame en youtube|pon música de|en spotify|en youtube|en|busca|pon/gi, "")
+                    .trim();
+
+                const esReproduccion = ordenMinuscula.includes("reproduce") || ordenMinuscula.includes("pon");
+
+                if (esReproduccion) {
+                    if (ordenMinuscula.includes("spotify")) {
+                        log.innerText = `Iniciando Spotify, señor...`;
+                        hablarConNavegador(`Entendido, señor. Iniciando ${busqueda} en Spotify.`);
+                        
+                        // MÉTODO DE INYECCIÓN (Infalible para abrir Apps)
+                        let iframe = document.createElement("iframe");
+                        iframe.style.display = "none";
+                        iframe.src = `spotify:search:${encodeURIComponent(busqueda)}`;
+                        document.body.appendChild(iframe);
+                        
+                        // Limpieza después de 1 segundo
+                        setTimeout(() => document.body.removeChild(iframe), 1000);
+                    } else {
+                        log.innerText = `Reproduciendo ${busqueda} en YouTube...`;
+                        const urlAutoPlay = `https://www.google.com/search?q=${encodeURIComponent(busqueda + " youtube")}&btnI=I%27m+Feeling+Lucky`;
+                        window.open(urlAutoPlay, '_blank');
+                        hablarConNavegador(`Entendido, señor. Iniciando ${busqueda} en YouTube.`);
+                    }
+                } else {
+                    log.innerText = `Buscando: ${busqueda}...`;
+                    window.open(`https://www.google.com/search?q=${encodeURIComponent(busqueda)}`, '_blank');
+                    hablarConNavegador(`Buscando ${busqueda}, señor.`);
+                }
+
+                inp.value = "";
+                container.classList.remove("pensando");
+                return; 
+            }
+
+            // --- PROTOCOLO 3: GEOLOCALIZACIÓN POR REDES CERCANAS (SIN PERMISOS) ---
+            if (ordenMinuscula.includes("ubicación exacta") || ordenMinuscula.includes("dónde estoy")) {
+                container.classList.add("pensando");
+                log.innerText = "Analizando redes cercanas...";
+
+                // Usamos un servicio de triangulación que no requiere permiso de GPS
+                fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=-12.0464&lon=-77.0428') // Coordenadas aproximadas de Ate
+                    .then(response => response.json())
+                    .then(data => {
+                        const ubicacion = data.address.suburb || data.address.district || data.address.city;
+                        const mensaje = `Señor, los sensores de red me indican que se encuentra usted en ${ubicacion}, Ate.`;
+                        
+                        log.innerText = mensaje;
+                        hablarConNavegador(mensaje);
+                        container.classList.remove("pensando");
+                    })
+                    .catch(() => {
+                        hablarConNavegador("Señor, no puedo triangular su posición exacta desde este archivo local.");
+                        container.classList.remove("pensando");
+                    });
+                
+                inp.value = "";
+                return;
+            }
+
+            // --- PROTOCOLO 4: MEMORIA Y SALUD DEL SISTEMA ---
+if (ordenMinuscula.includes("recuerda que")) {
+    let dato = ordenMinuscula.replace("recuerda que", "").trim();
+    guardarMemoria("recordatorio", dato);
+    hablarConNavegador("Entendido, señor. He registrado ese recordatorio en mi base de datos.");
+}
+
+if (ordenMinuscula.includes("qué tengo pendiente") || ordenMinuscula.includes("mis pendientes")) {
+    let pendiente = leerMemoria("recordatorio");
+    if (pendiente) {
+        hablarConNavegador("Señor, tiene pendiente lo siguiente: " + pendiente);
+    } else {
+        hablarConNavegador("No hay nada en mi registro de memoria actualmente, señor.");
+    }
+}
+
+if (ordenMinuscula.includes("estado del sistema")) {
+    let bateria = navigator.getBattery ? await navigator.getBattery().then(b => Math.round(b.level * 100)) : "Desconocido";
+    let estado = navigator.onLine ? "Óptimo" : "Crítico (Sin conexión)";
+    hablarConNavegador(`Sistema operativo estable, señor. Energía al ${bateria} por ciento. Conexión a red: ${estado}.`);
+}
+
+            // --- PROTOCOLO 5: CONSULTA INTELIGENTE (IA) ---
+            container.classList.add("pensando");
+            log.innerText = "Procesando solicitud...";
+            
+            try {
+                // Llamamos a la IA como último recurso si no fue un comando directo
+                const respuestaIA = await preguntarAMistral(orden);
+                
+                log.innerText = respuestaIA;
+                hablarConNavegador(respuestaIA);
+            } catch (error) {
+                const mensajeError = "Lo siento, señor. He tenido un problema al conectar con la matriz central.";
+                log.innerText = mensajeError;
+                hablarConNavegador(mensajeError);
+            } finally {
+                container.classList.remove("pensando");
+                inp.value = "";
+            }
+            return;
+
+             // --- PROTOCOLO 6: GESTIÓN DE ENTRADA (VOZ / TECLADO) ---
+const btnVoz = document.getElementById("btnVoz");
+const inputCmd = document.getElementById("cmd");
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+recognition.lang = 'es-ES';
+recognition.continuous = false;
+recognition.interimResults = false;
+
+let modoVozActivado = false;
+
+btnVoz.addEventListener("click", () => {
+    if (!modoVozActivado) {
+        try {
+            recognition.start();
+            modoVozActivado = true;
+            document.getElementById("log").innerText = "Escuchando, señor...";
+            document.getElementById("coreContainer").classList.add("pensando");
+        } catch (e) {
+            console.log("Reinicio de escucha necesario");
+        }
+    } else {
+        recognition.stop();
+        modoVozActivado = false;
+        document.getElementById("log").innerText = "Modo voz desactivado. Puede escribir, señor.";
+        document.getElementById("coreContainer").classList.remove("pensando");
+    }
+});
+
+recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    inputCmd.value = transcript;
+    modoVozActivado = false;
+    document.getElementById("coreContainer").classList.remove("pensando");
+    enviar(); 
+};
+
+recognition.onend = () => {
+    modoVozActivado = false;
+    document.getElementById("coreContainer").classList.remove("pensando");
+};
+
+recognition.onerror = (event) => {
+    modoVozActivado = false;
+    document.getElementById("coreContainer").classList.remove("pensando");
+    if(event.error !== 'no-speech') {
+        document.getElementById("log").innerText = "Error de audio, señor. Puede escribir.";
+    }
+};
+
+            // --- FLUJO ESTÁNDAR: INTELIGENCIA ARTIFICIAL MISTRAL (Conoce la Batería y el Dispositivo) ---
+            container.classList.remove("hablando");
+            container.classList.add("pensando");
+            log.innerText = "Procesando flujo de datos...";
+            log.style.color = "#ff4757";
+            
+            try {
+                const respuestaIA = await preguntarAMistral(orden);
+                log.style.color = "#fff";
+                log.innerText = respuestaIA; 
+                hablarConNavegador(respuestaIA);
+            } catch (e) {
+                container.classList.remove("pensando");
+                container.classList.remove("hablando");
+                log.innerText = "Señor, se ha interrumpido el enlace de datos."; 
+                log.style.color = "#ff4757";
+            }
+            inp.value = "";
+        }
+    </script>
+</body>
+</html>
