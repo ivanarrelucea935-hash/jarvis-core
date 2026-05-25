@@ -23,7 +23,7 @@
             margin: 0;
             overflow: hidden;
             position: relative;
-        }
+            }
 
         #particleCanvas {
             position: absolute;
@@ -50,7 +50,7 @@
             z-index: 2;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-        }
+            }
 
         h2 {
             font-size: 1.1rem;
@@ -59,7 +59,7 @@
             text-shadow: 0 0 12px var(--neon-glow);
             font-weight: 300;
             color: #fff;
-        }
+            }
 
         /* Indicador HUD de Batería */
         #hud-battery {
@@ -68,7 +68,7 @@
             color: rgba(0, 173, 181, 0.6);
             margin-bottom: 20px;
             text-transform: uppercase;
-        }
+            }
 
         .orbe-wrapper {
             position: relative;
@@ -76,7 +76,7 @@
             height: 150px;
             margin-bottom: 35px;
             cursor: pointer;
-        }
+            }
 
         .orbe-externo {
             position: absolute;
@@ -86,7 +86,7 @@
             border: 2px dashed rgba(0, 173, 181, 0.3);
             animation: rotarAnillo 16s linear infinite;
             transition: all 0.4s ease;
-        }
+            }
 
         .orbe-nucleo {
             position: absolute;
@@ -100,7 +100,7 @@
             animation: palpitar 3s ease-in-out infinite;
             transition: all 0.4s ease;
             overflow: hidden;
-        }
+            }
 
         .orbe-nucleo::before {
             content: '';
@@ -113,7 +113,7 @@
             left: 0;
             animation: escanearSistemas 4s ease-in-out infinite;
             opacity: 0.7;
-        }
+            }
 
         .orbe-nucleo::after {
             content: '';
@@ -126,39 +126,39 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 0 15px rgba(0, 173, 181, 0.3);
             animation: destello 2s ease-in-out infinite alternate;
-        }
+            }
 
         .pensando .orbe-nucleo {
             animation: procesar 0.3s ease-in-out infinite alternate;
             background: radial-gradient(circle, #ff4757 0%, rgba(40,10,20,0.85) 65%, rgba(4,4,6,1) 100%);
             box-shadow: 0 0 45px rgba(255, 71, 87, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.4);
-        }
+            }
         .pensando .orbe-nucleo::before {
             background: #ff4757;
             box-shadow: 0 0 8px #ff4757;
             animation: escanearSistemas 0.8s linear infinite;
-        }
+            }
         .pensando .orbe-externo {
             border-color: rgba(255, 71, 87, 0.5);
             animation: rotarAnillo 0.8s linear infinite;
-        }
+            }
 
         .hablando .orbe-nucleo {
             animation: ecualizarOrbe 0.12s ease-in-out infinite alternate;
             box-shadow: 0 0 55px rgba(0, 220, 230, 0.8), inset 0 0 25px rgba(255, 255, 255, 0.5);
             background: radial-gradient(circle, rgba(0,230,240,1) 0%, rgba(10,40,70,0.85) 60%, rgba(4,4,6,1) 100%);
-        }
+            }
         .hablando .orbe-externo {
             animation: rotarAnillo 0.4s linear infinite;
             border-color: rgba(0, 255, 255, 0.7);
             transform: scale(1.08);
-        }
+            }
 
         .input-box {
             width: 100%;
             position: relative;
             margin-bottom: 15px;
-        }
+            }
 
         input { 
             width: 100%; 
@@ -173,13 +173,13 @@
             box-sizing: border-box;
             transition: all 0.3s ease;
             letter-spacing: 0.5px;
-        }
+            }
 
         input:focus { 
             border-color: var(--neon-blue);
             box-shadow: 0 0 20px rgba(0, 173, 181, 0.25);
             background: rgba(15, 15, 25, 0.9);
-        }
+            }
 
         #log { 
             color: #a0a5b5; 
@@ -189,39 +189,39 @@
             min-height: 50px;
             text-align: center;
             letter-spacing: 0.2px;
-        }
+            }
 
         @keyframes rotarAnillo {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
-        }
+            }
 
         @keyframes palpitar {
             0% { transform: scale(1); opacity: 0.9; }
             50% { transform: scale(1.03); opacity: 1; box-shadow: 0 0 35px rgba(0, 173, 181, 0.7); }
             100% { transform: scale(1); opacity: 0.9; }
-        }
+            }
 
         @keyframes destello {
             0% { transform: scale(0.96); opacity: 0.2; }
             100% { transform: scale(1.04); opacity: 0.6; }
-        }
+            }
 
         @keyframes procesar {
             0% { transform: scale(1.02); }
             100% { transform: scale(1.08); }
-        }
+            }
 
         @keyframes ecualizarOrbe {
             0% { transform: scale(0.97) rotate(-0.5deg); }
             100% { transform: scale(1.07) rotate(0.5deg); }
-        }
+            }
 
         @keyframes escanearSistemas {
             0% { top: -10%; }
             50% { top: 110%; }
             100% { top: -10%; }
-        }
+            }
     </style>
 </head>
 <body>
@@ -376,7 +376,7 @@
                         await trackLinterna.applyConstraints({ advanced: [{ torch: false }] });
                         trackLinterna.stop();
                         trackLinterna = null;
-                    }
+                      }
                     return true;
                 }
             } catch (e) {
@@ -422,7 +422,7 @@
                 uttr.onend = function() { container.classList.remove("hablando"); };
                 uttr.onerror = function() { container.classList.remove("hablando"); };
                 window.speechSynthesis.speak(uttr);
-            }
+                }
         }
        
         function guardarMemoria(clave, valor) {
@@ -595,26 +595,26 @@
             }
 
             // --- PROTOCOLO 4: MEMORIA Y SALUD DEL SISTEMA ---
-if (ordenMinuscula.includes("recuerda que")) {
-    let dato = ordenMinuscula.replace("recuerda que", "").trim();
-    guardarMemoria("recordatorio", dato);
-    hablarConNavegador("Entendido, señor. He registrado ese recordatorio en mi base de datos.");
-}
+            if (ordenMinuscula.includes("recuerda que")) {
+                let dato = ordenMinuscula.replace("recuerda que", "").trim();
+                guardarMemoria("recordatorio", dato);
+                hablarConNavegador("Entendido, señor. He registrado ese recordatorio en mi base de datos.");
+            }
 
-if (ordenMinuscula.includes("qué tengo pendiente") || ordenMinuscula.includes("mis pendientes")) {
-    let pendiente = leerMemoria("recordatorio");
-    if (pendiente) {
-        hablarConNavegador("Señor, tiene pendiente lo siguiente: " + pendiente);
-    } else {
-        hablarConNavegador("No hay nada en mi registro de memoria actualmente, señor.");
-    }
-}
+            if (ordenMinuscula.includes("qué tengo pendiente") || ordenMinuscula.includes("mis pendientes")) {
+                let pendiente = leerMemoria("recordatorio");
+                if (pendiente) {
+                    hablarConNavegador("Señor, tiene pendiente lo siguiente: " + pendiente);
+                } else {
+                    hablarConNavegador("No hay nada en mi registro de memoria actualmente, señor.");
+                }
+            }
 
-if (ordenMinuscula.includes("estado del sistema")) {
-    let bateria = navigator.getBattery ? await navigator.getBattery().then(b => Math.round(b.level * 100)) : "Desconocido";
-    let estado = navigator.onLine ? "Óptimo" : "Crítico (Sin conexión)";
-    hablarConNavegador(`Sistema operativo estable, señor. Energía al ${bateria} por ciento. Conexión a red: ${estado}.`);
-}
+            if (ordenMinuscula.includes("estado del sistema")) {
+                let bateria = navigator.getBattery ? await navigator.getBattery().then(b => Math.round(b.level * 100)) : "Desconocido";
+                let estado = navigator.onLine ? "Óptimo" : "Crítico (Sin conexión)";
+                hablarConNavegador(`Sistema operativo estable, señor. Energía al ${bateria} por ciento. Conexión a red: ${estado}.`);
+            }
 
             // --- PROTOCOLO 5: CONSULTA INTELIGENTE (IA) ---
             container.classList.add("pensando");
@@ -637,73 +637,73 @@ if (ordenMinuscula.includes("estado del sistema")) {
             return;
 
              // --- PROTOCOLO 6: GESTIÓN DE ENTRADA (VOZ / TECLADO) ---
-const btnVoz = document.getElementById("btnVoz");
-const inputCmd = document.getElementById("cmd");
-const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+             const btnVoz = document.getElementById("btnVoz");
+             const inputCmd = document.getElementById("cmd");
+             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 
-recognition.lang = 'es-ES';
-recognition.continuous = false;
-recognition.interimResults = false;
+             recognition.lang = 'es-ES';
+             recognition.continuous = false;
+             recognition.interimResults = false;
 
-let modoVozActivado = false;
+             let modoVozActivado = false;
 
-btnVoz.addEventListener("click", () => {
-    if (!modoVozActivado) {
-        try {
-            recognition.start();
-            modoVozActivado = true;
-            document.getElementById("log").innerText = "Escuchando, señor...";
-            document.getElementById("coreContainer").classList.add("pensando");
-        } catch (e) {
-            console.log("Reinicio de escucha necesario");
-        }
-    } else {
-        recognition.stop();
-        modoVozActivado = false;
-        document.getElementById("log").innerText = "Modo voz desactivado. Puede escribir, señor.";
-        document.getElementById("coreContainer").classList.remove("pensando");
-    }
-});
+             btnVoz.addEventListener("click", () => {
+                  if (!modoVozActivado) {
+                      try {
+                          recognition.start();
+                          modoVozActivado = true;
+                          document.getElementById("log").innerText = "Escuchando, señor...";
+                          document.getElementById("coreContainer").classList.add("pensando");
+                      } catch (e) {
+                          console.log("Reinicio de escucha necesario");
+                      }
+                  } else {
+                      recognition.stop();
+                      modoVozActivado = false;
+                      document.getElementById("log").innerText = "Modo voz desactivado. Puede escribir, señor.";
+                      document.getElementById("coreContainer").classList.remove("pensando");
+                  }
+              });
 
-recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    inputCmd.value = transcript;
-    modoVozActivado = false;
-    document.getElementById("coreContainer").classList.remove("pensando");
-    enviar(); 
-};
+             recognition.onresult = (event) => {
+                  const transcript = event.results[0][0].transcript;
+                  inputCmd.value = transcript;
+                  modoVozActivado = false;
+                  document.getElementById("coreContainer").classList.remove("pensando");
+                  enviar(); 
+              };
 
-recognition.onend = () => {
-    modoVozActivado = false;
-    document.getElementById("coreContainer").classList.remove("pensando");
-};
+             recognition.onend = () => {
+                  modoVozActivado = false;
+                  document.getElementById("coreContainer").classList.remove("pensando");
+              };
 
-recognition.onerror = (event) => {
-    modoVozActivado = false;
-    document.getElementById("coreContainer").classList.remove("pensando");
-    if(event.error !== 'no-speech') {
-        document.getElementById("log").innerText = "Error de audio, señor. Puede escribir.";
-    }
-};
+             recognition.onerror = (event) => {
+                  modoVozActivado = false;
+                  document.getElementById("coreContainer").classList.remove("pensando");
+                  if(event.error !== 'no-speech') {
+                      document.getElementById("log").innerText = "Error de audio, señor. Puede escribir.";
+                  }
+              };
 
-            // --- FLUJO ESTÁNDAR: INTELIGENCIA ARTIFICIAL MISTRAL (Conoce la Batería y el Dispositivo) ---
-            container.classList.remove("hablando");
-            container.classList.add("pensando");
-            log.innerText = "Procesando flujo de datos...";
-            log.style.color = "#ff4757";
-            
-            try {
-                const respuestaIA = await preguntarAMistral(orden);
-                log.style.color = "#fff";
-                log.innerText = respuestaIA; 
-                hablarConNavegador(respuestaIA);
-            } catch (e) {
-                container.classList.remove("pensando");
-                container.classList.remove("hablando");
-                log.innerText = "Señor, se ha interrumpido el enlace de datos."; 
-                log.style.color = "#ff4757";
-            }
-            inp.value = "";
+             // --- FLUJO ESTÁNDAR: INTELIGENCIA ARTIFICIAL MISTRAL (Conoce la Batería y el Dispositivo) ---
+             container.classList.remove("hablando");
+             container.classList.add("pensando");
+             log.innerText = "Procesando flujo de datos...";
+             log.style.color = "#ff4757";
+             
+             try {
+                  const respuestaIA = await preguntarAMistral(orden);
+                  log.style.color = "#fff";
+                  log.innerText = respuestaIA; 
+                  hablarConNavegador(respuestaIA);
+              } catch (e) {
+                  container.classList.remove("pensando");
+                  container.classList.remove("hablando");
+                  log.innerText = "Señor, se ha interrumpido el enlace de datos."; 
+                  log.style.color = "#ff4757";
+              }
+             inp.value = "";
         }
     </script>
 </body>
