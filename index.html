@@ -381,6 +381,28 @@
             }
         }
 
+        // --- Módulo de Voz Integrado ---
+        const btnVoz = document.getElementById("btnVoz");
+        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (Recognition) {
+            const recognition = new Recognition();
+            recognition.lang = 'es-ES';
+            recognition.continuous = false;
+
+            btnVoz.onclick = () => {
+                recognition.start();
+                document.getElementById("log").innerText = "Escuchando...";
+            };
+
+            recognition.onresult = (event) => {
+                const texto = event.results[0][0].transcript;
+                document.getElementById("cmd").value = texto;
+                enviar();
+            };
+        } else {
+            btnVoz.style.display = "none";
+        }
+
         setTimeout(() => {
             ejecutarSonidoDiagnostico();
             inicializarMonitorBateria();
